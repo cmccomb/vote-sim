@@ -1,74 +1,59 @@
 from numpy import dot, unique, max, inf, round, zeros, mean, ones, delete
 from numpy.random import rand, shuffle, normal
 from random import choice, sample
-from copy import deepcopy
 from itertools import permutations, combinations
 from scipy.io import loadmat
 from scipy.stats import kendalltau
 
 
-# In[10]:
-
-# target = "20141114_predicted_pilot.mat"
-# target = "20141118_predicted_class.mat"
-# target = "20141118_predicted_class_better.mat"
-# target = "20141207_beta_stuff.mat"
-target = "20141208_jackknife.mat"
-
-
-# ## Dictionary Sorting
-# How to sort dictionaries 101.
-
-# In[11]:
-
+# Miscellaneous functions
 def find_dict_max(some_dict):
-  max_key = []
-  max_val = -inf
+    max_key = []
+    max_val = -inf
   
-  for k, v in some_dict.iteritems():
-    if v > max_val:
-      max_val = v
-      max_key = k
-      
-  return max_key
+    for k, v in some_dict.iteritems():
+        if v > max_val:
+            max_val = v
+            max_key = k
+
+    return max_key
+
 
 def find_dict_min(some_dict):
-  min_key = []
-  min_val = inf
-  
-  for k, v in some_dict.iteritems():
-    if v < min_val:
-      min_val = v
-      min_key = k
-      
-  return min_key
+    min_key = []
+    min_val = inf
+
+    for k, v in some_dict.iteritems():
+        if v < min_val:
+            min_val = v
+            min_key = k
+
+    return min_key
+
 
 def sort_dict(some_dict, direction='ascending'):
-  some_dict = some_dict.copy()
-  
-  if direction == 'ascending':
-    find_next = find_dict_min
-    reset = inf
-  elif direction == 'descending':
-    find_next = find_dict_max
-    reset = -inf
-  else:
-    print("Please specify 'ascending' or 'descending'")
-    
-  ordering = []
-  for i in range(len(some_dict.keys())):
-    key = find_next(some_dict)
-    ordering.append(key)
-    some_dict[key] = reset
-  
-  return ordering
+    some_dict = some_dict.copy()
+
+    if direction == 'ascending':
+        find_next = find_dict_min
+        reset = inf
+    elif direction == 'descending':
+        find_next = find_dict_max
+        reset = -inf
+    else:
+        print("Please specify 'ascending' or 'descending'")
+        return 0
+
+    ordering = []
+    for i in range(len(some_dict.keys())):
+        key = find_next(some_dict)
+        ordering.append(key)
+        some_dict[key] = reset
+
+    return ordering
 
 
-# ## Voting Functions
-# Functions for modifying and getting the winner from voting profiles
-
-# In[12]:
-
+## Voting Functions
 def make_safe_profile(profile):
     prof = []
     for voter in profile[:]:
@@ -79,10 +64,12 @@ def make_safe_profile(profile):
 
     return prof
 
+
 def remove_candidate(profile, candidate):
     # Remove from profiles
     for voter in profile:
         voter.remove(candidate)
+
 
 def plurality(profile):
     # Make dictionary
@@ -97,8 +84,9 @@ def plurality(profile):
 
     return social_preference, candidates
 
+
 def veto(profile):
-    # Make dictionary        
+    # Make dictionary
     candidates = dict.fromkeys(list(unique(profile[0])), 0)
 
     # Count vetos
@@ -110,8 +98,9 @@ def veto(profile):
 
     return social_preference, candidates
 
+
 def borda(profile):
-    # Make dictionary        
+    # Make dictionary
     candidates = dict.fromkeys(list(unique(profile[0])), 0)
 
     # Count score
@@ -124,8 +113,9 @@ def borda(profile):
 
     return social_preference, candidates
 
+
 def copeland(profile):
-    # Make dictionary        
+    # Make dictionary
     candidates = dict.fromkeys(list(unique(profile[0])), 0)
     all_names = candidates.keys()
     m = len(all_names)
@@ -154,6 +144,7 @@ def copeland(profile):
 
     return social_preference, candidates
 
+
 def irv(profile):
 
     # Make new profile for safety
@@ -176,7 +167,7 @@ def irv(profile):
         # Get number of voters, alternatives
         m = len(prof[0])
 
-    social_preference.append(sp[0])    
+    social_preference.append(sp[0])
     social_preference.reverse()
 
     return social_preference, res
@@ -184,25 +175,21 @@ def irv(profile):
 RULES = [plurality, veto, borda, irv, copeland]
 
 
-
 ## Preference Profile
-
-# In[13]:
-
 class SubProfile(object):
-    
+
     CHECKS = ['Strategy-proof', 'Arrow-Fair', 'IIA by Removal', 'IIA by Inclusion', 'Unanimity']
-    
+
     def __init__(self, profile):
         self.orig_profile = profile
         self.n = len(self.orig_profile)
         self.m = len(self.orig_profile[0])
         self.names = list(unique(self.orig_profile[0]))
-        
+
     def make_reduced_profile(self, candidates):
         # Figure out which to remove
         to_remove = list(set(self.names) - set(candidates))
-        
+
         # Make a new profile
         self.temp_profile = make_safe_profile(self.orig_profile)
         self.temp_names = candidates
@@ -210,7 +197,7 @@ class SubProfile(object):
         # Remove as appropriate
         for cand in to_remove:
             remove_candidate(self.temp_profile, cand)
-            
+
         # Make a probability matrix
         m = len(self.temp_profile[0])
         probs = zeros([m, m])
@@ -219,9 +206,9 @@ class SubProfile(object):
                 for j, name2 in enumerate(self.temp_names):
                     if voter.index(name1) > voter.index(name2):
                         probs[i,j] += 1.0
-                        
+
         self.temp_probs = probs/len(self.temp_profile)
-            
+
     def strategyproof(self, rule):
         # Get number of voters, alternatives
         names = list(unique(self.temp_profile[0]))
@@ -249,7 +236,7 @@ class SubProfile(object):
                         return False
         else:
             return True
-        
+
     def unanimity(self, rule):
         # Get number of voters, alternatives
         names = list(unique(self.temp_profile[0]))
@@ -258,7 +245,7 @@ class SubProfile(object):
 
         # Check ranking as is
         sp, _ = rule(self.temp_profile)
-        
+
         for i, name1 in enumerate(self.temp_names):
             for j, name2 in enumerate(self.temp_names):
                 if self.temp_probs[i,j] == 1.0:
@@ -290,19 +277,19 @@ class SubProfile(object):
                     return False
         else:
             return True
-        
+
     def iia_by_inclusion(self, rule):
         # Get number of voters, alternatives
         names = list(unique(self.temp_profile[0]))
         m = len(names)
         n = len(self.temp_profile)
-                
+
         # Get winner
         sp_orig, _ = rule(self.temp_profile)
-        
+
         # Make list of names to add
         add_names = list(set(self.names) - set(names))
-        
+
         for name in add_names:
             new_names = names[:]
             new_names.append(name)
@@ -313,14 +300,14 @@ class SubProfile(object):
                 return False
         else:
             return True
-    
+
     def check(self, rule):
         sp = self.strategyproof(rule)
         una = self.unanimity(rule)
         iiar = self.iia_by_removal(rule)
         iiai = self.iia_by_inclusion(rule)
         return sp, una*iiar*iiai, iiar, iiai, una
-        
+
 
 
 ## Full Empirical Profile
@@ -328,10 +315,10 @@ class SubProfile(object):
 # In[14]:
 
 class FullEmpiricalProfile(object):
-    
+
     def __init__(self, target, delt=0.1):
         MAT = loadmat(target)
-        
+
         # This loads the predicted ratings, and sorts them.
         ratings = MAT["predicted_ratings"].T
         self.full_mat = MAT["full_mat"]
@@ -361,24 +348,24 @@ class FullEmpiricalProfile(object):
         probs /= (self.n+delt)
 
         self.probs = probs
-            
-    def make_random_team(self, n_team, n_cand):  
+
+    def make_random_team(self, n_team, n_cand):
         # Make the new profile
         new_profile = []
         for i in range(n_team):
             x = self.names[:]
             shuffle(x)
             new_profile.append(x)
-        
+
         # Select some candidates
         new_names = sample(self.names, n_cand)
-            
+
         p = SubProfile(new_profile)
         p.make_reduced_profile(new_names)
-        
+
         return p
-        
-    def make_empirical_team(self, n_team, n_cand):  
+
+    def make_empirical_team(self, n_team, n_cand):
         # Make the new profile
         new_profile = []
         for _ in range(n_team):
@@ -387,12 +374,12 @@ class FullEmpiricalProfile(object):
 
         # Select some candidates
         new_names = sample(self.names, n_cand)
-            
+
         p = SubProfile(new_profile)
         p.make_reduced_profile(new_names)
-        
+
         return p
-    
+
     def make_empirical_team2(self, n_team, n_cand):
         # Go through and generate set of ratings
         all_ratings = []
@@ -401,7 +388,7 @@ class FullEmpiricalProfile(object):
             alpha = self.alpha_mean + dot(self.chol_cov, temp)
             rating = dot(self.full_mat, alpha.T)
             all_ratings.append(rating)
-            
+
         # From ratings, generate rankings
         m = len(all_ratings[0])
         names = [format(i, '02d') for i in range(m)]
@@ -411,13 +398,13 @@ class FullEmpiricalProfile(object):
             temp2 = sorted(temp, reverse=True)
             ranking =[temp2[i][1] for i in range(m)]
             profile.append(ranking)
-            
+
         # Select some candidates
         new_names = sample(self.names, n_cand)
-            
+
         p = SubProfile(profile)
         p.make_reduced_profile(new_names)
-        
+
         return p
 
 
