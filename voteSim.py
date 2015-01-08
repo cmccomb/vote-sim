@@ -1,12 +1,11 @@
 from numpy import dot, unique, max, inf, round, zeros, mean, ones, delete
-from numpy.random import rand, shuffle, normal
+from numpy.random import shuffle, normal
 from random import choice, sample
 from itertools import permutations, combinations
 from scipy.io import loadmat
-from scipy.stats import kendalltau
 
 
-# Miscellaneous functions
+# Finds maximum value in a dict, returns key
 def find_dict_max(some_dict):
     max_key = []
     max_val = -inf
@@ -19,6 +18,7 @@ def find_dict_max(some_dict):
     return max_key
 
 
+# Finds minimum value in a dict, returns key
 def find_dict_min(some_dict):
     min_key = []
     min_val = inf
@@ -31,6 +31,7 @@ def find_dict_min(some_dict):
     return min_key
 
 
+# Returns list of keys in dict, ordered in terms of values
 def sort_dict(some_dict, direction='ascending'):
     some_dict = some_dict.copy()
 
@@ -94,7 +95,7 @@ def veto(profile):
         candidates[voter[-1]] += 1
 
     # Return winner
-    social_preference= sort_dict(candidates, 'ascending')
+    social_preference = sort_dict(candidates, 'ascending')
 
     return social_preference, candidates
 
@@ -109,7 +110,7 @@ def borda(profile):
             candidates[cand] += idx
 
     # Return winner
-    social_preference= sort_dict(candidates, 'ascending')
+    social_preference = sort_dict(candidates, 'ascending')
 
     return social_preference, candidates
 
@@ -154,6 +155,7 @@ def irv(profile):
     m = len(prof[0])
 
     res = []
+    sp = [0]
     social_preference = []
     while m > 1:
         # Find the loser
@@ -177,8 +179,6 @@ RULES = [plurality, veto, borda, irv, copeland]
 
 ## Preference Profile
 class SubProfile(object):
-
-    CHECKS = ['Strategy-proof', 'Arrow-Fair', 'IIA by Removal', 'IIA by Inclusion', 'Unanimity']
 
     def __init__(self, profile):
         self.orig_profile = profile
@@ -222,9 +222,6 @@ class SubProfile(object):
         # Create all permutations
         options = permutations(names)
 
-        # Create results dictionary
-        results = {"Voter": [], "Strategy": [], "New winner": []}
-
         # Check all strategies
         for i in range(n):
             if self.temp_profile[i][0] != winner:
@@ -232,87 +229,24 @@ class SubProfile(object):
                 for strategy in options:
                     prof[i] = list(strategy)
                     sp, sc = rule(prof)
-                    if self.temp_profile[i].index(sp[0]) < self.temp_profile[i].index(winner):
+                    if self.temp_profile[i].index(sp[0]) < \
+                            self.temp_profile[i].index(winner):
                         return False
         else:
             return True
 
     def unanimity(self, rule):
-        # Get number of voters, alternatives
-        names = list(unique(self.temp_profile[0]))
-        m = len(names)
-        n = len(self.temp_profile)
-
         # Check ranking as is
         sp, _ = rule(self.temp_profile)
 
         for i, name1 in enumerate(self.temp_names):
             for j, name2 in enumerate(self.temp_names):
-                if self.temp_probs[i,j] == 1.0:
+                if self.temp_probs[i, j] == 1.0:
                     if sp.index(name1) < sp.index(name2):
                         return False
         else:
             return True
 
-    def iia_by_removal(self, rule):
-        # Get number of voters, alternatives
-        names = list(unique(self.temp_profile[0]))
-        m = len(names)
-        n = len(self.temp_profile)
-  
-        # Get winner, and remove from alternative
-        sp_orig, _ = rule(self.temp_profile)
-  
-        for i in range(1, len(names)-1):
-            groups = combinations(names, i)
-            for group in groups:
-                prof = make_safe_profile(self.temp_profile)
-                sp_correct = sp_orig[:]
-                for name in group:
-                    remove_candidate(prof, name)
-                    sp_correct.remove(name)
-
-                sp, _ = rule(prof)
-                if sp_correct != sp:
-                    return False
-        else:
-            return True
-
-    def iia_by_inclusion(self, rule):
-        # Get number of voters, alternatives
-        names = list(unique(self.temp_profile[0]))
-        m = len(names)
-        n = len(self.temp_profile)
-
-        # Get winner
-        sp_orig, _ = rule(self.temp_profile)
-
-        # Make list of names to add
-        add_names = list(set(self.names) - set(names))
-
-        for name in add_names:
-            new_names = names[:]
-            new_names.append(name)
-            self.make_reduced_profile(new_names)
-            sp, _ = rule(self.temp_profile)
-            sp.remove(name)
-            if sp != sp_orig:
-                return False
-        else:
-            return True
-
-    def check(self, rule):
-        sp = self.strategyproof(rule)
-        una = self.unanimity(rule)
-        iiar = self.iia_by_removal(rule)
-        iiai = self.iia_by_inclusion(rule)
-        return sp, una*iiar*iiai, iiar, iiai, una
-
-
-
-## Full Empirical Profile
-
-# In[14]:
 
 class FullEmpiricalProfile(object):
 
@@ -330,7 +264,7 @@ class FullEmpiricalProfile(object):
         for voter in ratings:
             temp = [(voter[i], names[i]) for i in range(m)]
             temp2 = sorted(temp, reverse=True)
-            ranking =[temp2[i][1] for i in range(m)]
+            ranking = [temp2[i][1] for i in range(m)]
             profile.append(ranking)
 
         self.profile = profile
@@ -343,7 +277,7 @@ class FullEmpiricalProfile(object):
             for i, name1 in enumerate(self.names):
                 for j, name2 in enumerate(self.names):
                     if voter.index(name1) > voter.index(name2):
-                        probs[i,j] += 1.0
+                        probs[i, j] += 1.0
 
         probs /= (self.n+delt)
 
@@ -396,7 +330,7 @@ class FullEmpiricalProfile(object):
         for voter in all_ratings:
             temp = [(voter[i], names[i]) for i in range(m)]
             temp2 = sorted(temp, reverse=True)
-            ranking =[temp2[i][1] for i in range(m)]
+            ranking = [temp2[i][1] for i in range(m)]
             profile.append(ranking)
 
         # Select some candidates
