@@ -210,6 +210,25 @@ class PreferenceProfile(object):
 
         self.prob /= len(self.profile)
 
+    def set_profile(self, profile):
+        # Store profile and characteristics
+        self.profile = profile
+        self.m = len(profile[0])
+        self.n = len(profile)
+
+        # Make list of names
+        self.names = np.unique(profile[0])
+
+        # Make the probability comparison matrix
+        self.prob = np.zeros([self.m, self.m])
+        for voter in self.profile:
+            for i, name1 in enumerate(self.names):
+                for j, name2 in enumerate(self.names):
+                    if voter.index(name1) > voter.index(name2):
+                        self.prob[i, j] += 1.0
+
+        self.prob /= len(self.profile)
+
     def strategyproof(self, rule):
         # Check ranking as is
         sp, sc = rule(self.profile)
@@ -242,12 +261,3 @@ class PreferenceProfile(object):
                         return False
         else:
             return True
-
-
-PP = PreferenceProfile()
-PP.make_random_profile(m=5, n=25)
-for x in PP.profile:
-    print(x)
-
-print(copeland(PP.profile))
-print(PP.unanimity(copeland))
