@@ -1,9 +1,9 @@
 Voting Simulation and Analysis: ``votesim``
-========================
+===========================================
 Python functions for simulating voting rules and analyses.
 
 Voting Rules
-========================
+============
 Currently, 5 voting rules are implemented in ``votesim``.
 
 1. Veto
@@ -13,7 +13,7 @@ Currently, 5 voting rules are implemented in ``votesim``.
 5. Copeland
 
 Axiom Checks
-========================
+============
 Currently, the results of a voting scenario can be checked against two social choice axioms.
 
 1. Monotinicity
