@@ -51,7 +51,7 @@ def sort_dict(some_dict, direction='ascending'):
     return ordering
 
 
-## Voting Functions
+# Voting Functions
 def safe_copy(profile):
     prof = []
     for voter in profile[:]:
@@ -174,7 +174,7 @@ def irv(profile):
 RULES = [plurality, veto, borda, irv, copeland]
 
 
-## Preference Profile
+# Preference Profile
 class PreferenceProfile(object):
 
     def __init__(self):
