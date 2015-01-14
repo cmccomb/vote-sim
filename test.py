@@ -1,4 +1,4 @@
-import .votesim
+import votesim
 import unittest
 
 
