@@ -7,7 +7,7 @@ def find_dict_max(some_dict):
     max_key = []
     max_val = -np.inf
   
-    for k in some_dict.keys():
+    for k in sorted(some_dict.keys()):
         if some_dict[k] > max_val:
             max_val = some_dict[k]
             max_key = k
@@ -20,7 +20,7 @@ def find_dict_min(some_dict):
     min_key = []
     min_val = np.inf
 
-    for k in some_dict.keys():
+    for k in sorted(some_dict.keys()):
         if some_dict[k] < min_val:
             min_val = some_dict[k]
             min_key = k
