@@ -1,4 +1,4 @@
-import votesim
+import core
 import unittest
 
 
