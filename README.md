@@ -1,4 +1,4 @@
-# votesim [![Build Status](https://travis-ci.org/cmccomb/votesim.svg?branch=master)](https://travis-ci.org/cmccomb/votesim)
+# vote-sim [![Build Status](https://travis-ci.org/cmccomb/vote-sim.svg?branch=master)](https://travis-ci.org/cmccomb/vote-sim)
 
 Python functions for simulating voting rules and analyses.
 
