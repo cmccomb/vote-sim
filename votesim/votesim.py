@@ -261,22 +261,3 @@ class PreferenceProfile(object):
                         return False
         else:
             return True
-#
-# P = PreferenceProfile()
-# P.set_profile([
-#     ['a', 'b', 'c', 'd'],
-#     ['a', 'b', 'd', 'c'],
-#     ['a', 'b', 'd', 'c'],
-#     ['a', 'b', 'd', 'c'],
-#     ['a', 'd', 'c', 'b'],
-#     ['a', 'd', 'c', 'b'],
-#     ['a', 'b', 'c', 'd'],
-#     ['b', 'c', 'd', 'a'],
-#     ['a', 'b', 'c', 'd'],
-#     ['a', 'b', 'c', 'd'],
-#     ['b', 'a', 'c', 'd']
-# ])
-#
-#
-# for rule in RULES:
-#     print(P.profile[0])
