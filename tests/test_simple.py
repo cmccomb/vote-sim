@@ -26,6 +26,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
     def test_votes(self):
         for rule in votesim.RULES:
+            print(rule(self.P.profile)[0])
             self.assertEqual(rule(self.P.profile)[0], ['a', 'b', 'c', 'd'])
 
     def test_unanimity(self):
