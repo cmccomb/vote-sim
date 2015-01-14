@@ -1,4 +1,4 @@
-from votesim import PreferenceProfile, RULES
+from votesim import votesim
 import unittest
 
 
