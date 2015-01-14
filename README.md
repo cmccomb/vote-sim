@@ -1,9 +1,8 @@
-Voting Simulation and Analysis: ``votesim``
-===========================================
+# votesim
+[![Build Status](https://travis-ci.org/cmccomb/votesim.svg?branch=master)](https://travis-ci.org/cmccomb/votesim)
 Python functions for simulating voting rules and analyses.
 
-Voting Rules
-============
+## Voting Rules
 Currently, 5 voting rules are implemented in ``votesim``.
 
 1. Veto
@@ -12,8 +11,7 @@ Currently, 5 voting rules are implemented in ``votesim``.
 4. Instant Runoff Voting (IRV)
 5. Copeland
 
-Axiom Checks
-============
+## Axiom Checks
 Currently, the results of a voting scenario can be checked against two social choice axioms.
 
 1. Monotinicity
