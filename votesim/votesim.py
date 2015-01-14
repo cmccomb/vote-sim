@@ -115,7 +115,7 @@ def borda(profile):
 def copeland(profile):
     # Make dictionary
     candidates = dict.fromkeys(list(np.unique(profile[0])), 0)
-    all_names = candidates.keys()
+    all_names = list(candidates.keys())
     m = len(all_names)
 
     # Compare every pair of candidates
