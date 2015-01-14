@@ -1,11 +1,11 @@
-import core
+import votesim
 import unittest
 
 
 class TestSequenceFunctions(unittest.TestCase):
 
     def setUp(self):
-        self.P = core.PreferenceProfile()
+        self.P = votesim.PreferenceProfile()
         self.P.set_profile([
             ['a', 'b', 'c', 'd'],
             ['a', 'b', 'd', 'c'],
@@ -25,19 +25,19 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(self.P.n, 11)
 
     def test_votes(self):
-        for rule in core.RULES:
+        for rule in votesim.RULES:
             self.assertEqual(rule(self.P.profile)[0], ['a', 'b', 'c', 'd'])
 
     def test_unanimity(self):
-        for rule in core.RULES:
+        for rule in votesim.RULES:
             self.assertEqual(self.P.unanimity(rule), True)
 
     def test_sp(self):
-        for rule in core.RULES:
+        for rule in votesim.RULES:
             self.assertEqual(self.P.strategyproof(rule), True)
 
     def test_random_setup(self):
-        P = core.PreferenceProfile()
+        P = votesim.PreferenceProfile()
         P.make_random_profile(n=15, m=7)
         self.assertEqual(P.n, 15)
         self.assertEqual(P.m, 7)
