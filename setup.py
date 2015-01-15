@@ -16,6 +16,6 @@ setup(
     long_description=readme,
     author='Christopher McComb',
     author_email='chris.c.mccomb@gmail.com',
-    url='https://github.com/cmccomb/votesim',
+    url='https://github.com/cmccomb/vote-sim',
     license=license,
 )
