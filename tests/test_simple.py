@@ -2,7 +2,7 @@ from votesim import votesim
 import unittest
 
 
-class TestSequenceFunctions(unittest.TestCase):
+class TestFunctions(unittest.TestCase):
 
     def setUp(self):
         self.P = votesim.PreferenceProfile()
